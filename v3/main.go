@@ -7,9 +7,15 @@ import (
 )
 
 const (
-	MaxWorker = 2
-	MaxQueue  = 50
-	Address   = ":3002"
+	MaxWorker    = 16
+	MaxQueue     = 50
+	Address      = ":3002"
+	QueuedResult = true
+)
+
+var (
+	works = 0
+	done  = 0
 )
 
 func main() {

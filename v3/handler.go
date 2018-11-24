@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-var works int = 0
-
 type presponse struct {
 	ID string `json:"id"`
 }
@@ -18,14 +16,11 @@ const (
 )
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(formatRequest(r))
+	//fmt.Println(formatRequest(r))
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
-	r.ParseMultipartForm(defaultMaxMemory2)
-	fmt.Println(r.MultipartForm)
 
 	imageFile, header, err := r.FormFile("file")
 
@@ -41,20 +36,23 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		ID:        id,
 		ImageFile: imageFile,
 		ImageName: imageName[0],
+		w:         w,
 	}}
 	works = works + 1
 
 	JobQueue <- work
-	fmt.Printf("<- work #%d, queue size: %d\n", works, len(JobQueue))
+	fmt.Printf("<- work #%d, queue size: %d/%d, predicted:%d\n", works, len(JobQueue), cap(JobQueue), done)
 
-	js, err := json.Marshal(&presponse{ID: id})
-	if err != nil {
-		fmt.Println(err)
-		return
+	if QueuedResult {
+		js, err := json.Marshal(&presponse{ID: id})
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
 }
 
 func formatRequest(r *http.Request) string {

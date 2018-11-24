@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/draw"
@@ -9,6 +10,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -21,6 +23,7 @@ type Request struct {
 	ID        string
 	ImageFile multipart.File
 	ImageName string
+	w         http.ResponseWriter
 }
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -34,7 +37,7 @@ func RandStringBytes(n int) string {
 }
 
 func (p *Request) predict() error {
-	fmt.Println("Handeling request " + time.Now().String())
+	fmt.Println("Handling request " + time.Now().String())
 	modeldir := "model"
 	labelfile := "labels.txt"
 
@@ -146,6 +149,18 @@ func (p *Request) predict() error {
 	err = jpeg.Encode(outfile, img, &opt)
 	if err != nil {
 		return err
+	}
+
+	done = done + 1
+	fmt.Printf("Finished predicting #%d with Id:%s\n", done, p.ID)
+
+	if !QueuedResult {
+		js, err := json.Marshal(&presponse{ID: p.ID})
+		if err != nil {
+			return err
+		}
+		p.w.Header().Set("Content-Type", "application/json")
+		p.w.Write(js)
 	}
 
 	return nil
