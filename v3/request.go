@@ -38,13 +38,13 @@ func RandStringBytes(n int) string {
 
 func (p *Request) predict() error {
 	fmt.Println("Handling request " + time.Now().String())
-	modeldir := "model"
-	labelfile := "labels.txt"
+	modeldir := "meta/model"
+	labelfile := "meta/labels.txt"
 
 	defer p.ImageFile.Close()
 
-	inputName := "input/" + p.ImageName + "-input-" + p.ID + ".jpg"
-	outputName := "output/" + p.ImageName + "-output-" + p.ID + ".jpg"
+	inputName := "meta/input/" + p.ImageName + "-input-" + p.ID + ".jpg"
+	outputName := "meta/output/" + p.ImageName + "-output-" + p.ID + ".jpg"
 
 	// Load the labels
 	loadLabels(labelfile)

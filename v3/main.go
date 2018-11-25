@@ -10,7 +10,7 @@ const (
 	MaxWorker    = 16
 	MaxQueue     = 50
 	Address      = ":3002"
-	QueuedResult = true
+	QueuedResult = false
 )
 
 var (
