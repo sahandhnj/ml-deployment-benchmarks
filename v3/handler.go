@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type presponse struct {
@@ -16,6 +17,7 @@ const (
 )
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	//fmt.Println(formatRequest(r))
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -42,6 +44,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 	JobQueue <- work
 	fmt.Printf("<- work #%d, queue size: %d/%d, predicted:%d\n", works, len(JobQueue), cap(JobQueue), done)
+	reqservice.Add(start, time.Since(start).Nanoseconds())
 
 	if QueuedResult {
 		js, err := json.Marshal(&presponse{ID: id})
