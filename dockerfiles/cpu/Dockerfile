@@ -66,7 +66,7 @@ ENV RUNTIME /runtime
 RUN mkdir $RUNTIME
 RUN mkdir $RUNTIME/meta
 
-WORKDIR "$GOPATH/src/github.com/sahandhnj/ml-deployment-benchmarks"
+WORKDIR "$GOPATH/src/github.com/sahandhnj/ml-deployment-benchmarks/v3"
 COPY v3/. .
 RUN go get ./... 
 RUN go build -o $RUNTIME/server .
