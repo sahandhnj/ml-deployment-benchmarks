@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	MaxWorker    = 16
-	MaxQueue     = 50
+	MaxWorker    = 0
+	MaxQueue     = 0
 	Address      = ":3002"
 	QueuedResult = false
 )

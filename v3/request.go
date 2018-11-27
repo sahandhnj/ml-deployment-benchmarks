@@ -19,11 +19,29 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type Status string
+
+const (
+	Queued     = "Queued"
+	Processing = "Processing"
+	Done       = "Done"
+	Failed     = "Failed"
+)
+
 type Request struct {
 	ID        string
 	ImageFile multipart.File
 	ImageName string
-	w         http.ResponseWriter
+	w         *http.ResponseWriter
+	Status    Status
+	StartedAt time.Time
+}
+
+type Resp struct {
+	RequestedAt    time.Time `json:"requestedAt"`
+	ProcessingTime int64     `json:"processingTime"`
+	Status         Status    `json:"status"`
+	Output         string    `json:"output"`
 }
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -37,6 +55,8 @@ func RandStringBytes(n int) string {
 }
 
 func (p *Request) predict() error {
+	startProcessing := time.Now()
+
 	fmt.Println("Handling request " + time.Now().String())
 	modeldir := "meta/model"
 	labelfile := "meta/labels.txt"
@@ -155,12 +175,22 @@ func (p *Request) predict() error {
 	fmt.Printf("Finished predicting #%d with Id:%s\n", done, p.ID)
 
 	if !QueuedResult {
-		js, err := json.Marshal(&presponse{ID: p.ID})
+		processingTime := time.Since(startProcessing).Nanoseconds()
+		reqservice.Add(startProcessing, processingTime)
+		resp := &Resp{
+			RequestedAt:    p.StartedAt,
+			ProcessingTime: processingTime,
+			Status:         Done,
+			Output:         outputName,
+		}
+		fmt.Printf("%v", resp)
+		json, err := json.Marshal(resp)
 		if err != nil {
 			return err
 		}
-		p.w.Header().Set("Content-Type", "application/json")
-		p.w.Write(js)
+		l := *p.w
+		l.Header().Set("Content-Type", "application/json")
+		l.Write(json)
 	}
 
 	return nil

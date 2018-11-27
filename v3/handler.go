@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -38,15 +39,15 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		ID:        id,
 		ImageFile: imageFile,
 		ImageName: imageName[0],
-		w:         w,
+		w:         &w,
+		StartedAt: start,
 	}}
 	works = works + 1
 
-	JobQueue <- work
-	fmt.Printf("<- work #%d, queue size: %d/%d, predicted:%d\n", works, len(JobQueue), cap(JobQueue), done)
-	reqservice.Add(start, time.Since(start).Nanoseconds())
-
 	if QueuedResult {
+		JobQueue <- work
+		fmt.Printf("<- work #%d, queue size: %d/%d, predicted:%d\n", works, len(JobQueue), cap(JobQueue), done)
+		fmt.Println("Queued")
 		js, err := json.Marshal(&presponse{ID: id})
 		if err != nil {
 			fmt.Println(err)
@@ -55,6 +56,10 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(js)
+	} else {
+		if err := work.Request.predict(); err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 }
 
