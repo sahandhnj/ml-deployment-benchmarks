@@ -181,13 +181,14 @@ func (p *Request) predict() error {
 			RequestedAt:    p.StartedAt,
 			ProcessingTime: processingTime,
 			Status:         Done,
-			Output:         outputName,
+			Output:         "http://ml.sentriq.io/" + outputName,
 		}
-		fmt.Printf("%v", resp)
+
 		json, err := json.Marshal(resp)
 		if err != nil {
 			return err
 		}
+
 		l := *p.w
 		l.Header().Set("Content-Type", "application/json")
 		l.Write(json)
