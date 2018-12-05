@@ -159,7 +159,7 @@ func (p *Request) predict() error {
 
 		Rect(img, int(x1), int(y1), int(x2), int(y2), 4, colornames.Map[colornames.Names[int(classes[curObj])]])
 		addLabel(img, int(x1), int(y1), int(classes[curObj]), getLabel(curObj, probabilities, classes))
-		fmt.Println(getLabel(curObj, probabilities, classes))
+
 		per := getPredictionLabel(curObj, probabilities, classes)
 
 		if per.Probabiliy > 0 {
