@@ -161,7 +161,7 @@ func (p *Request) predict() error {
 		addLabel(img, int(x1), int(y1), int(classes[curObj]), getLabel(curObj, probabilities, classes))
 		fmt.Println(getLabel(curObj, probabilities, classes))
 		per := getPredictionLabel(curObj, probabilities, classes)
-		fmt.Println(per.Name)
+
 		if per.Probabiliy > 0 {
 			predictions = append(predictions, per)
 		}

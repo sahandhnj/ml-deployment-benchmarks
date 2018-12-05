@@ -131,13 +131,6 @@ func getLabel(idx int, probabilities []float32, classes []float32) string {
 	return label
 }
 
-// func getPrediction(idx int, probabilities []float32, classes []float32) *Prediction {
-// 	index := int(classes[idx])
-// 	label := fmt.Sprintf("%s (%2.0f%%)", labels[index], probabilities[idx]*100.0)
-
-// 	return label
-// }
-
 func addLabel(img *image.RGBA, x, y, class int, label string) {
 	col := colornames.Map[colornames.Names[class]]
 	point := fixed.Point26_6{fixed.Int26_6(x * 64), fixed.Int26_6(y * 64)}
