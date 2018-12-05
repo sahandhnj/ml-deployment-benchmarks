@@ -5,6 +5,6 @@ go build -o server
 ls
 mv server ../server
 cd ..
-rm output/*
-rm input/*
+rm meta/output/*
+rm meta/input/*
 ./server

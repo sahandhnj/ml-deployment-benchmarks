@@ -38,10 +38,16 @@ type Request struct {
 }
 
 type Resp struct {
-	RequestedAt    time.Time `json:"requestedAt"`
-	ProcessingTime int64     `json:"processingTime"`
-	Status         Status    `json:"status"`
-	Output         string    `json:"output"`
+	RequestedAt    time.Time    `json:"requestedAt"`
+	ProcessingTime int64        `json:"processingTime"`
+	Status         Status       `json:"status"`
+	Predictions    []Prediction `json:"prediction"`
+	Output         string       `json:"output"`
+}
+
+type Prediction struct {
+	Name       string  `json:"name"`
+	Probabiliy float32 `json:"probability"`
 }
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -143,8 +149,9 @@ func (p *Request) predict() error {
 	// Draw a box around the objects
 	curObj := 0
 
+	predictions := make([]Prediction, 0)
 	// 0.4 is an arbitrary threshold, below this the results get a bit random
-	for probabilities[curObj] > 0.4 {
+	for probabilities[curObj] > 0.4 && curObj < 5 {
 		x1 := float32(img.Bounds().Max.X) * boxes[curObj][1]
 		x2 := float32(img.Bounds().Max.X) * boxes[curObj][3]
 		y1 := float32(img.Bounds().Max.Y) * boxes[curObj][0]
@@ -152,7 +159,12 @@ func (p *Request) predict() error {
 
 		Rect(img, int(x1), int(y1), int(x2), int(y2), 4, colornames.Map[colornames.Names[int(classes[curObj])]])
 		addLabel(img, int(x1), int(y1), int(classes[curObj]), getLabel(curObj, probabilities, classes))
-
+		fmt.Println(getLabel(curObj, probabilities, classes))
+		per := getPredictionLabel(curObj, probabilities, classes)
+		fmt.Println(per.Name)
+		if per.Probabiliy > 0 {
+			predictions = append(predictions, per)
+		}
 		curObj++
 	}
 
@@ -181,7 +193,8 @@ func (p *Request) predict() error {
 			RequestedAt:    p.StartedAt,
 			ProcessingTime: processingTime,
 			Status:         Done,
-			Output:         "http://ml.sentriq.io/" + outputName,
+			Predictions:    predictions,
+			Output:         "http://ml.launchai.io/" + outputName,
 		}
 
 		json, err := json.Marshal(resp)

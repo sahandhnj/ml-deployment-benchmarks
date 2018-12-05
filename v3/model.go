@@ -115,12 +115,28 @@ func loadLabels(labelsFile string) {
 	}
 }
 
+func getPredictionLabel(idx int, probabilities []float32, classes []float32) Prediction {
+	index := int(classes[idx])
+
+	return Prediction{
+		Name:       labels[index],
+		Probabiliy: probabilities[idx] * 100.0,
+	}
+}
+
 func getLabel(idx int, probabilities []float32, classes []float32) string {
 	index := int(classes[idx])
 	label := fmt.Sprintf("%s (%2.0f%%)", labels[index], probabilities[idx]*100.0)
 
 	return label
 }
+
+// func getPrediction(idx int, probabilities []float32, classes []float32) *Prediction {
+// 	index := int(classes[idx])
+// 	label := fmt.Sprintf("%s (%2.0f%%)", labels[index], probabilities[idx]*100.0)
+
+// 	return label
+// }
 
 func addLabel(img *image.RGBA, x, y, class int, label string) {
 	col := colornames.Map[colornames.Names[class]]
