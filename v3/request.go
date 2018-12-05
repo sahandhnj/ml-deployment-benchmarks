@@ -24,7 +24,7 @@ type Status string
 const (
 	Queued     = "Queued"
 	Processing = "Processing"
-	Done       = "Done"
+	Done       = "Success"
 	Failed     = "Failed"
 )
 
