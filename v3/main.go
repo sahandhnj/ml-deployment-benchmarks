@@ -25,7 +25,7 @@ var dbhandler *db.DBStore
 var reqservice *service.ReqService
 
 func main() {
-	http.HandleFunc("/imagedetector/v1/predict", requestHandler)
+	http.HandleFunc("/coco/v1/predict", requestHandler)
 	http.HandleFunc("/stat", reqDataHandler)
 
 	fmt.Printf("size of queue %d\n", MaxQueue)
