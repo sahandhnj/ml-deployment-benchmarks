@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"golang.org/x/image/colornames"
 
@@ -117,9 +118,10 @@ func loadLabels(labelsFile string) {
 
 func getPredictionLabel(idx int, probabilities []float32, classes []float32) Prediction {
 	index := int(classes[idx])
+	name := strings.Split(labels[index], ": ")
 
 	return Prediction{
-		Name:       labels[index],
+		Name:       name[1],
 		Probabiliy: probabilities[idx] * 100.0,
 	}
 }
